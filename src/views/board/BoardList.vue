@@ -78,26 +78,30 @@ export default {
     this.fnGetList()
   },
   methods: {
-    fnGetList() {
-      this.requestBody = { // 데이터 전송
-        keyword: this.keyword,
-        page: this.page,
-        size: this.size
-      }
+   fnGetList() {
+     this.requestBody = { // 데이터 전송
+       keyword: this.keyword,
+       page: this.page,
+       size: this.size
+     }
 
-      this.$axios.get(this.$serverUrl + "/board/list", {
-        params: this.requestBody,
-        headers: {}
-      }).then((res) => {
+     this.$axios.get(this.$serverUrl + "/board/list", {
+       params: this.requestBody,
+       headers: {}
+     }).then((res) => {
 
-        this.list = res.data  //서버에서 데이터를 목록으로 보내므로 바로 할당하여 사용할 수 있다.
+       if (res.data.result_code === "OK") {
+         this.list = res.data.data
+         this.paging = res.data.pagination
+         this.no = this.paging.total_list_cnt - ((this.paging.page - 1) * this.paging.page_size)
+       }
 
-      }).catch((err) => {
-        if (err.message.indexOf('Network Error') > -1) {
-          alert('네트워크가 원활하지 않습니다.\n잠시 후 다시 시도해주세요.')
-        }
-      })
-    },
+     }).catch((err) => {
+       if (err.message.indexOf('Network Error') > -1) {
+         alert('네트워크가 원활하지 않습니다.\n잠시 후 다시 시도해주세요.')
+       }
+     })
+   },
     fnView(idx) {
       this.requestBody.idx = idx
       this.$router.push({
